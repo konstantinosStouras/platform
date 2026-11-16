@@ -18,7 +18,8 @@
           "https://stouras-marketplace-2026.firebaseapp.com/__/auth/handler",
           "https://www.stouras.com/__/auth/handler",
           "https://stouras.com/__/auth/handler",
-          "http://localhost"
+          "http://localhost",
+          "https://stouras-platform-2026.firebaseapp.com/__/auth/handler"
         ]
       }
     }

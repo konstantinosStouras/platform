@@ -6,6 +6,7 @@ Classroom foundation for two-sided and multi-sided platform simulations.
 - Instructor workspace: https://www.stouras.com/platform/#/admin
 - Firebase project: `stouras-marketplace-2026`
 - Firebase display name: Platform Lab. The existing immutable project ID is retained so accounts and session data remain intact.
+- Sign-in and email-action domain: `stouras-platform-2026.firebaseapp.com`, a Hosting alias attached to the same Firebase web app. Email sender display names are Platform Lab.
 - Firestore: Standard edition, `(default)`, London (`europe-west2`)
 
 ## Included
