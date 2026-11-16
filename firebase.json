@@ -1,0 +1,38 @@
+{
+  "firestore": {
+    "database": "(default)",
+    "location": "europe-west2",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json",
+    "predeploy": [
+      "node check-project.mjs"
+    ]
+  },
+  "auth": {
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Marketplace Lab",
+        "supportEmail": "kstouras@gmail.com",
+        "authorizedRedirectUris": [
+          "https://stouras-marketplace-2026.firebaseapp.com/__/auth/handler",
+          "https://www.stouras.com/__/auth/handler",
+          "https://stouras.com/__/auth/handler",
+          "http://localhost"
+        ]
+      }
+    }
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8086
+    },
+    "auth": {
+      "port": 9098
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true
+  }
+}

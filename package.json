@@ -1,0 +1,20 @@
+{
+  "name": "marketplace-simulation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test tests/domain.test.mjs",
+    "test:rules": "node --test tests/rules.test.mjs",
+    "check": "node --check app.mjs && node --check src/backend.mjs && node --check src/domain.mjs"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "@playwright/test": "^1.65.1",
+    "firebase": "^12.19.0"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.13.6"
+  }
+}

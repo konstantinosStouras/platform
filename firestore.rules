@@ -1,0 +1,59 @@
+rules_version = '2';
+// sessions/{10-character code}: title (1–100), description (0–1000), sides (2–8
+// unique names, 1–40 each), mode (class/test), ownerId (immutable), status,
+// createdAt (immutable), updatedAt. No student names or email addresses.
+// sessions/{code}/members/{uid}: alias (1–80), side, kind (student/test), joinedAt.
+// users/{uid}/sessions/{code}: joinedAt only; private session index.
+// instructors/{email}: enabled boolean, createdAt; only bootstrap admin writes.
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function signedIn(){return request.auth != null;}
+  function verified(){return signedIn() && request.auth.token.email_verified == true;}
+  function admin(){return verified() && request.auth.token.email == 'kstouras@gmail.com';}
+  function instructor(){return verified() && (admin() || exists(/databases/$(database)/documents/instructors/$(request.auth.token.email)) && get(/databases/$(database)/documents/instructors/$(request.auth.token.email)).data.enabled == true);}
+  function own(uid){return verified() && request.auth.uid == uid;}
+  function session(id){return get(/databases/$(database)/documents/sessions/$(id)).data;}
+  function teacher(id){return instructor() && session(id).ownerId == request.auth.uid;}
+  function text(v,min,max){return v is string && v.size() >= min && v.size() <= max;}
+  function sideAt(s,i){return s.size() <= i || text(s[i],1,40);}
+  function validSession(d){return d.keys().hasOnly(['title','description','sides','mode','ownerId','status','createdAt','updatedAt'])
+   && text(d.title,1,100) && text(d.description,0,1000) && text(d.ownerId,1,128)
+   && d.sides is list && d.sides.size() >= 2 && d.sides.size() <= 8 && d.sides.toSet().size() == d.sides.size()
+   && sideAt(d.sides,0) && sideAt(d.sides,1) && sideAt(d.sides,2) && sideAt(d.sides,3) && sideAt(d.sides,4) && sideAt(d.sides,5) && sideAt(d.sides,6) && sideAt(d.sides,7)
+   && d.mode in ['class','test'] && d.status in ['lobby','active','paused','closed'] && d.createdAt is timestamp && d.updatedAt == request.time;}
+  function transition(a,b){return a == 'lobby' && b in ['active','closed'] || a == 'active' && b in ['paused','closed'] || a == 'paused' && b in ['active','closed'];}
+  function validMember(d,id){return d.keys().hasOnly(['alias','side','kind','joinedAt']) && text(d.alias,1,80) && text(d.side,1,40) && d.side in session(id).sides && d.kind in ['student','test'] && d.joinedAt is timestamp;}
+  function validIndex(d){return d.keys().hasOnly(['joinedAt']) && d.joinedAt is timestamp;}
+  function validInstructor(d){return d.keys().hasOnly(['enabled','createdAt']) && d.enabled is bool && d.createdAt is timestamp;}
+  match /instructors/{email} {
+   allow get: if verified() && (request.auth.token.email == email || admin());
+   allow list: if admin();
+   allow create: if admin() && text(email,3,254) && validInstructor(request.resource.data) && request.resource.data.createdAt == request.time;
+   allow update: if admin() && validInstructor(request.resource.data) && request.resource.data.createdAt == resource.data.createdAt;
+   allow delete: if admin();
+  }
+  match /sessions/{id} {
+   // A verified student can resolve an unguessable class invite code. Listing is owner-only.
+   allow get: if verified() && (!exists(/databases/$(database)/documents/sessions/$(id)) || resource.data.mode == 'class' || instructor() && resource.data.ownerId == request.auth.uid);
+   allow list: if instructor() && resource.data.ownerId == request.auth.uid;
+   allow create: if instructor() && id.matches('^[A-HJ-NP-Z2-9]{10}$') && validSession(request.resource.data) && request.resource.data.ownerId == request.auth.uid && request.resource.data.status == 'lobby' && request.resource.data.createdAt == request.time;
+   allow update: if teacher(id) && validSession(request.resource.data) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt']) && transition(resource.data.status,request.resource.data.status);
+   allow delete: if false;
+   match /members/{uid} {
+    allow get: if teacher(id) || own(uid) && session(id).mode == 'class';
+    allow list: if teacher(id);
+    allow create: if validMember(request.resource.data,id) && request.resource.data.joinedAt == request.time && (
+      own(uid) && session(id).mode == 'class' && session(id).status == 'lobby' && request.resource.data.kind == 'student'
+      && getAfter(/databases/$(database)/documents/users/$(uid)/sessions/$(id)).data.joinedAt == request.time
+      || teacher(id) && session(id).mode == 'test' && session(id).status == 'lobby' && request.resource.data.kind == 'test' && uid.matches('^test-[0-7]$'));
+    allow update: if teacher(id) && session(id).status == 'lobby' && validMember(request.resource.data,id) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['side']);
+    allow delete: if false;
+   }
+  }
+  match /users/{uid}/sessions/{id} {
+   allow read: if own(uid);
+   allow create: if own(uid) && validIndex(request.resource.data) && request.resource.data.joinedAt == request.time && getAfter(/databases/$(database)/documents/sessions/$(id)/members/$(uid)).data.kind == 'student';
+   allow update, delete: if false;
+  }
+ }
+}

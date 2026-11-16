@@ -1,0 +1,11 @@
+node_modules/
+.reference/
+.npm-cache/
+.firebase-cli-cache/
+.firebase/
+*-debug.log
+.env*
+test-results/
+playwright-report/
+.local/
+.local-*
