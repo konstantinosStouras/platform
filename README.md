@@ -1,10 +1,11 @@
-# Marketplace Lab
+# Platform Lab
 
-Classroom foundation for two-sided and multi-sided marketplace simulations.
+Classroom foundation for two-sided and multi-sided platform simulations.
 
-- Website: https://www.stouras.com/marketplace/
-- Instructor workspace: https://www.stouras.com/marketplace/#/admin
+- Website: https://www.stouras.com/platform/
+- Instructor workspace: https://www.stouras.com/platform/#/admin
 - Firebase project: `stouras-marketplace-2026`
+- Firebase display name: Platform Lab. The existing immutable project ID is retained so accounts and session data remain intact.
 - Firestore: Standard edition, `(default)`, London (`europe-west2`)
 
 ## Included
@@ -28,14 +29,14 @@ npm ci
 npm start
 npm run check
 npm test
-npx -y firebase-tools@latest emulators:exec --only firestore,auth --project demo-marketplace "npm run test:rules"
+npx -y firebase-tools@latest emulators:exec --only firestore,auth --project demo-platform "npm run test:rules"
 ```
 
-The emulator requires Java 21+. For browser tests, start the server and both emulators, then run `node tests/browser.mjs`. `http://127.0.0.1:4173/marketplace/?emulator=1` connects only to local emulators and uses the `demo-marketplace` project. Emulator mode is unavailable on production domains. Browser tests use the installed Chrome browser.
+The emulator requires Java 21+. For browser tests, start the server and both emulators, then run `node tests/browser.mjs`. `http://127.0.0.1:4173/platform/?emulator=1` connects only to local emulators and uses the `demo-platform` project. Emulator mode is unavailable on production domains. Browser tests use the installed Chrome browser.
 
 ## Deployment
 
-The main website mounts this repository at `/marketplace` as a Git submodule. Its existing “Publish independent projects” workflow updates the pinned source commit. The website keeps its existing GitHub Pages/Jekyll setup and domain.
+The main website mounts this repository at `/platform` as a Git submodule. Its existing “Publish independent projects” workflow updates the pinned source commit. The website keeps its existing GitHub Pages/Jekyll setup and domain.
 
 ```sh
 npx -y firebase-tools@latest deploy --only firestore,auth --project stouras-marketplace-2026

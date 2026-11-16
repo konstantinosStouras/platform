@@ -6,7 +6,7 @@ const response = await fetch(new URL('../firebase-config.json', import.meta.url)
 if(!response.ok) throw new Error('The service configuration could not be loaded. Please refresh.');
 const config=await response.json();
 const emulate=['localhost','127.0.0.1'].includes(location.hostname)&&new URLSearchParams(location.search).get('emulator')==='1';
-if(emulate){config.projectId='demo-marketplace';config.apiKey='demo-key';}
+if(emulate){config.projectId='demo-platform';config.apiKey='demo-key';}
 const app = initializeApp(config);
 export const auth = getAuth(app), db = getFirestore(app);
 if(emulate){connectAuthEmulator(auth,'http://127.0.0.1:9098',{disableWarnings:true});connectFirestoreEmulator(db,'127.0.0.1',8086);}
@@ -61,7 +61,7 @@ export async function joinSession(code,side) {
     if(existing.exists())return;
     const s=session.data();
     if(s.mode!=='class'||s.status!=='lobby')throw new Error('This session is not accepting students.');
-    if(!s.sides.includes(side))throw new Error('Select a marketplace side.');
+    if(!s.sides.includes(side))throw new Error('Select a platform side.');
     tx.set(member,{alias:'Participant '+crypto.randomUUID().slice(0,8).toUpperCase(),side,kind:'student',joinedAt:serverTimestamp()});
     tx.set(doc(db,'users',uid,'sessions',id),{joinedAt:serverTimestamp()});
   });return id;

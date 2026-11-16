@@ -12,7 +12,7 @@
     "providers": {
       "emailPassword": true,
       "googleSignIn": {
-        "oAuthBrandDisplayName": "Marketplace Lab",
+        "oAuthBrandDisplayName": "Platform Lab",
         "supportEmail": "kstouras@gmail.com",
         "authorizedRedirectUris": [
           "https://stouras-marketplace-2026.firebaseapp.com/__/auth/handler",

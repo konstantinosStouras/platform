@@ -7,7 +7,7 @@ const code='ABCDE23456';
 const base=()=>({title:'Class',description:'',sides:['Hosts','Guests'],mode:'class',ownerId:'teacher',status:'lobby',createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
 const member=()=>({alias:'Participant test',side:'Hosts',kind:'student',joinedAt:serverTimestamp()});
 before(async()=>{
- env=await initializeTestEnvironment({projectId:'demo-marketplace',firestore:{host:'127.0.0.1',port:8086,rules:await readFile('firestore.rules','utf8')}});
+ env=await initializeTestEnvironment({projectId:'demo-platform',firestore:{host:'127.0.0.1',port:8086,rules:await readFile('firestore.rules','utf8')}});
  await env.clearFirestore();
  teacher=env.authenticatedContext('teacher',{email:'kstouras@gmail.com',email_verified:true}).firestore();
  otherTeacher=env.authenticatedContext('other-teacher',{email:'other@example.com',email_verified:true}).firestore();
